@@ -48,3 +48,27 @@ aws ec2 describe-route-tables \
 
 aws ec2 describe-security-groups \
   --filters "Name=vpc-id,Values=$DEFAULT_VPC_ID"
+
+## Lab Observations
+
+The local AWS environment contained a default VPC:
+
+- VPC CIDR: `172.31.0.0/16`
+- Region: `us-east-1`
+- Three default subnets were present across separate Availability Zones.
+- Each subnet had `MapPublicIpOnLaunch` enabled.
+- The default route table contained:
+  - `172.31.0.0/16 -> local`
+  - `0.0.0.0/0 -> Internet Gateway`
+- The Internet Gateway was attached to the default VPC.
+- The VPC contained both the default security group and the existing `cloud-lab-sg`.
+
+## Key Troubleshooting Model
+
+For an internet-facing EC2 instance, verify:
+
+1. The instance is in the correct subnet.
+2. The subnet has a route to an Internet Gateway.
+3. The instance has a public IPv4 address.
+4. The Security Group allows the required traffic.
+5. The application is listening on the expected port.
