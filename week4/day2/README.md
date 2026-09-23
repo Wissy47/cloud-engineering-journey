@@ -2,7 +2,7 @@
 
 ## Objective
 
-Understand how AWS routes traffic between subnets, the VPC, and the internet.
+Understand how AWS routes traffic between subnets, the VPC, and the internet and Configure internet routing for a public subnet while keeping the private subnet isolated from direct internet access.
 
 ## Architecture
 
@@ -34,11 +34,26 @@ Private/main route table:
 
 10.40.0.0/16 -> local
 
+
+## Resources
+
+- VPC: vpc-c1d0eaf8
+- VPC CIDR: 10.40.0.0/16
+- Public subnet: subnet-f8d5a80c
+- Public subnet CIDR: 10.40.1.0/24
+- Private subnet: subnet-9a4a8120
+- Private subnet CIDR: 10.40.2.0/24
+- Internet Gateway: igw-84c0dacb
+- Public route table: rtb-a3a7467a
+- Route table association: rtbassoc-14906cdd
+
+
 ## Key Concepts
 
-- Every VPC has a main route table.
-- Custom route tables can be created for individual subnets.
-- A public subnet needs a route to an Internet Gateway.
-- 0.0.0.0/0 represents destinations not matched by a more specific IPv4 route.
+- Every VPC receives a main route table automatically.
+- A custom route table can be associated with a specific subnet.
+- A subnet becomes public when it has a route to an Internet Gateway.
+- 0.0.0.0/0 represents all IPv4 destinations not matched by a more specific route.
 - Public IP assignment and internet routing are separate concepts.
-- Private subnets normally do not have a direct route to an Internet Gateway.
+- MapPublicIpOnLaunch was enabled for the public subnet.
+- The private subnet was left without a direct Internet Gateway route.
