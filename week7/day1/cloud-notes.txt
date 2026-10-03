@@ -1,0 +1,4 @@
+Cloud Engineering Journey
+Week 7 Day 1
+Topic: Amazon S3 Fundamentals
+Region: us-east-1
