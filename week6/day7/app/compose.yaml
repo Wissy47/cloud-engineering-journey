@@ -1,0 +1,42 @@
+services:
+  web:
+    build: .
+    container_name: week6-day7-web
+    ports:
+      - "8091:80"
+    environment:
+      BACKEND_HOST: backend
+      BACKEND_PORT: "8000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - week6-day7-network
+
+  backend:
+    image: python:3.12-alpine
+    container_name: week6-day7-backend
+    command: /app/start.sh
+    volumes:
+      - ./backend/start.sh:/app/start.sh:ro
+      - backend-data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000')"
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    networks:
+      - week6-day7-network
+
+volumes:
+  backend-data:
+
+networks:
+  week6-day7-network:
+    driver: bridge

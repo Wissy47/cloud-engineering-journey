@@ -1,0 +1,22 @@
+services:
+  web:
+    build: .
+    container_name: week6-compose-web
+    ports:
+      - "8090:80"
+    environment:
+      APP_ENV: development
+      BACKEND_HOST: backend
+      BACKEND_PORT: "8000"
+    depends_on:
+      - backend
+
+  backend:
+    image: python:3.12-alpine
+    container_name: week6-compose-backend
+    command: python -m http.server 8000 --directory /data
+    volumes:
+      - backend-data:/data
+
+volumes:
+  backend-data:
