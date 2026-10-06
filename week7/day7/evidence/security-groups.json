@@ -1,0 +1,260 @@
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-b3e38c25f5fb18a94",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [],
+            "VpcId": "vpc-c1d0eaf8",
+            "OwnerId": "000000000000",
+            "GroupName": "week7-app-sg",
+            "Description": "Week 7 application tier",
+            "IpPermissions": []
+        },
+        {
+            "GroupId": "sg-f92cb6acdca55dbed",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "week5-alb-sg"
+                }
+            ],
+            "VpcId": "vpc-c1d0eaf8",
+            "OwnerId": "000000000000",
+            "GroupName": "week5-alb-sg",
+            "Description": "Week 5 Application Load Balancer security group",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 80,
+                    "ToPort": 80,
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        },
+        {
+            "GroupId": "sg-85c864b693b3ae82f",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [],
+            "VpcId": "vpc-c1d0eaf8",
+            "OwnerId": "000000000000",
+            "GroupName": "default",
+            "Description": "default VPC security group",
+            "IpPermissions": []
+        },
+        {
+            "GroupId": "sg-e57859fda5ead5e67",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "week5-backend-sg"
+                }
+            ],
+            "VpcId": "vpc-c1d0eaf8",
+            "OwnerId": "000000000000",
+            "GroupName": "week5-backend-sg",
+            "Description": "Allow HTTP from Week 5 ALB",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 80,
+                    "ToPort": 80,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "000000000000",
+                            "GroupId": "sg-f92cb6acdca55dbed"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 8080,
+                    "ToPort": 8080,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "000000000000",
+                            "GroupId": "sg-f92cb6acdca55dbed"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        },
+        {
+            "GroupId": "sg-f15cc5f8535cca2c6",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [],
+            "VpcId": "vpc-c1d0eaf8",
+            "OwnerId": "000000000000",
+            "GroupName": "week5-efs-sg",
+            "Description": "Allow NFS from Week 5 backend instances",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 2049,
+                    "ToPort": 2049,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "000000000000",
+                            "GroupId": "sg-e57859fda5ead5e67"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        },
+        {
+            "GroupId": "sg-fd976af4b0d224a71",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [],
+            "VpcId": "vpc-c1d0eaf8",
+            "OwnerId": "000000000000",
+            "GroupName": "week7-rds-sg",
+            "Description": "Allow PostgreSQL from application tier only",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 5432,
+                    "ToPort": 5432,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "000000000000",
+                            "GroupId": "sg-b3e38c25f5fb18a94"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        },
+        {
+            "GroupId": "sg-22fad3cc5698529e6",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "week4-web-sg"
+                }
+            ],
+            "VpcId": "vpc-c1d0eaf8",
+            "OwnerId": "000000000000",
+            "GroupName": "week4-web-sg",
+            "Description": "Week 4 public web server security group",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 80,
+                    "ToPort": 80,
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+CloudLab Week 7 Mini Project
+
+Services:
+- Amazon S3
+- Amazon RDS PostgreSQL
+- Amazon VPC
+- Security Groups
+- Amazon Route 53
+
+Purpose:
+Demonstrate secure application storage and database architecture.
+
+Status: Week 7 completed

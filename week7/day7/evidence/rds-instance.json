@@ -1,0 +1,73 @@
+{
+    "DBInstances": [
+        {
+            "DBInstanceIdentifier": "week7-private-postgres",
+            "DBInstanceClass": "db.t3.micro",
+            "Engine": "postgres",
+            "DBInstanceStatus": "available",
+            "MasterUsername": "cloudadmin",
+            "DBName": "cloudnetwork",
+            "Endpoint": {
+                "Address": "localhost",
+                "Port": 7003
+            },
+            "AllocatedStorage": 20,
+            "PreferredBackupWindow": "04:00-06:00",
+            "BackupRetentionPeriod": 1,
+            "VpcSecurityGroups": [
+                {
+                    "VpcSecurityGroupId": "sg-fd976af4b0d224a71",
+                    "Status": "active"
+                }
+            ],
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "default.postgres16",
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ],
+            "AvailabilityZone": "us-east-1a",
+            "DBSubnetGroup": {
+                "DBSubnetGroupName": "week7-private-db-subnets",
+                "DBSubnetGroupDescription": "Week 7 private RDS subnet group",
+                "VpcId": "vpc-c1d0eaf8",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-9a4a8120",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1a"
+                        },
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-9fb59c20",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1b"
+                        },
+                        "SubnetStatus": "Active"
+                    }
+                ],
+                "DBSubnetGroupArn": "arn:aws:rds:us-east-1:000000000000:subgrp:week7-private-db-subnets"
+            },
+            "PreferredMaintenanceWindow": "mon:00:00-mon:03:00",
+            "MultiAZ": false,
+            "EngineVersion": "16.3",
+            "AutoMinorVersionUpgrade": true,
+            "OptionGroupMemberships": [
+                {
+                    "OptionGroupName": "default:postgres-16",
+                    "Status": "in-sync"
+                }
+            ],
+            "PubliclyAccessible": false,
+            "StorageType": "gp2",
+            "StorageEncrypted": false,
+            "DbiResourceId": "db-7ACFC08F7E9B43D189F45D7D",
+            "CopyTagsToSnapshot": false,
+            "DBInstanceArn": "arn:aws:rds:us-east-1:000000000000:db:week7-private-postgres",
+            "IAMDatabaseAuthenticationEnabled": false,
+            "TagList": []
+        }
+    ]
+}

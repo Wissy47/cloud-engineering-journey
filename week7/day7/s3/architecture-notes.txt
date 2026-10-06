@@ -1,0 +1,4 @@
+Why the RDS instance is private
+Why the application SG is referenced by the RDS SG
+Why Route 53 is used
+Why S3 versioning is enabled

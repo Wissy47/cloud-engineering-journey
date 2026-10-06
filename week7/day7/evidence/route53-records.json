@@ -1,0 +1,63 @@
+{
+    "ResourceRecordSets": [
+        {
+            "Name": "api.cloudlab.internal.",
+            "Type": "A",
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "10.40.1.60"
+                }
+            ]
+        },
+        {
+            "Name": "app.cloudlab.internal.",
+            "Type": "A",
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "10.40.1.50"
+                }
+            ]
+        },
+        {
+            "Name": "cloudlab.internal.",
+            "Type": "NS",
+            "TTL": 172800,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-1.awsdns-01.org."
+                },
+                {
+                    "Value": "ns-2.awsdns-02.net."
+                },
+                {
+                    "Value": "ns-3.awsdns-03.com."
+                },
+                {
+                    "Value": "ns-4.awsdns-04.co.uk."
+                }
+            ]
+        },
+        {
+            "Name": "cloudlab.internal.",
+            "Type": "SOA",
+            "TTL": 900,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-1.awsdns-01.org awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+                }
+            ]
+        },
+        {
+            "Name": "db.cloudlab.internal.",
+            "Type": "CNAME",
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "localhost"
+                }
+            ]
+        }
+    ]
+}
