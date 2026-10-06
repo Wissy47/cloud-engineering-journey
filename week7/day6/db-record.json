@@ -1,0 +1,18 @@
+{
+  "Comment": "Internal database DNS alias",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "db.cloudlab.internal",
+        "Type": "CNAME",
+        "TTL": 300,
+        "ResourceRecords": [
+          {
+            "Value": "localhost"
+          }
+        ]
+      }
+    }
+  ]
+}
