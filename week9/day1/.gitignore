@@ -1,0 +1,28 @@
+# Terraform local providers
+.terraform/
+# Terraform state and backups
+*.tfstate
+*.tfstate.*
+
+# Saved plans
+*.tfplan
+tfplan
+*.tfplan.json
+
+# Variables that may contain secrets
+*.tfvars
+*.tfvars.json
+
+# Local overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Local Terraform CLI configuration
+.terraformrc
+terraform.rc
