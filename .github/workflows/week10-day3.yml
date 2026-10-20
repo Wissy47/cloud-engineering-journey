@@ -1,0 +1,68 @@
+
+name: Week 10 Day 3 - Docker Build CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "week10/day3/**"
+      - ".github/workflows/week10-day3.yml"
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "week10/day3/**"
+      - ".github/workflows/week10-day3.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker-build:
+    name: Build and Verify Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./week10/day3
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: week10-day3-api:ci
+
+      - name: Inspect image architecture
+        run: |
+          docker image inspect week10-day3-api:ci \
+            --format 'OS={{.Os}} Architecture={{.Architecture}}'
+
+      - name: Test container health endpoint
+        run: |
+          docker run -d \
+            --name week10-day3-ci-test \
+            -p 127.0.0.1:8093:8080 \
+            week10-day3-api:ci
+
+          for attempt in $(seq 1 10); do
+            if curl --fail --silent \
+              http://127.0.0.1:8093/health; then
+              echo
+              echo "Container health check passed"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          docker logs week10-day3-ci-test
+          exit 1
