@@ -1,0 +1,35 @@
+
+name: Week 10 Day 1 - First CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/week10-day1.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  introduction:
+    name: Explore GitHub Actions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Display welcome message
+        run: echo "Welcome to Week 10 CI/CD Training"
+
+      - name: Display runner information
+        run: |
+          echo "Operating System:"
+          uname -a
+          echo "Working Directory:"
+          pwd
+
+      - name: Verify Python
+        run: |
+          python3 --version
+          python3 -c "print('Python execution successful')"
