@@ -100,3 +100,12 @@ jobs:
       - name: Show floci logs on failure
         if: failure()
         run: docker logs --tail 100 week10-day4-floci 2>&1 || true
+      - name: Clean up disposable floci
+        if: always()
+        run: |
+          if docker container inspect week10-day4-floci > /dev/null 2>&1; then
+            docker rm -f week10-day4-floci
+            echo "Disposable floci container removed."
+          else
+            echo "No disposable floci container to remove."
+          fi
