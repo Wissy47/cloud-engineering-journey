@@ -50,3 +50,53 @@ jobs:
 
       - name: Validate Terraform configuration
         run: terraform validate -no-color
+      - name: Start disposable floci
+        run: |
+          docker run -d \
+            --name week10-day4-floci \
+            -p 127.0.0.1:4566:4566 \
+            floci/floci:2.3.0
+
+      - name: Wait for floci health
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent \
+              http://127.0.0.1:4566/_localstack/health \
+              > /dev/null; then
+              echo "floci health check passed"
+              exit 0
+            fi
+
+            echo "Waiting for floci: attempt ${attempt}"
+            sleep 2
+          done
+
+          docker logs --tail 80 week10-day4-floci
+          exit 1
+
+      - name: Generate Terraform plan
+        run: |
+          set +e
+
+          terraform plan \
+            -input=false \
+            -no-color \
+            -refresh=false \
+            -detailed-exitcode
+
+          PLAN_EXIT_CODE=$?
+
+          set -e
+
+          if [ "$PLAN_EXIT_CODE" -eq 2 ]; then
+            echo "Terraform plan succeeded: infrastructure changes proposed."
+          elif [ "$PLAN_EXIT_CODE" -eq 0 ]; then
+            echo "Terraform plan succeeded: no infrastructure changes."
+          else
+            echo "Terraform plan failed with exit code ${PLAN_EXIT_CODE}."
+            exit "$PLAN_EXIT_CODE"
+          fi
+
+      - name: Show floci logs on failure
+        if: failure()
+        run: docker logs --tail 100 week10-day4-floci 2>&1 || true
