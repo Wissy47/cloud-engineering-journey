@@ -1,0 +1,64 @@
+
+name: Week 10 Day 5 - Environment Deployment Simulation
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: "Select deployment environment"
+        required: true
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+
+permissions:
+  contents: read
+
+jobs:
+  simulate-deployment:
+    name: Simulate deployment
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ inputs.target_environment }}
+
+    env:
+      APP_ENV: ${{ vars.APP_ENV }}
+      LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+      TARGET_ENV: ${{ inputs.target_environment }}
+
+    steps:
+      - name: Validate environment configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$APP_ENV" || -z "$LOG_LEVEL" ]]; then
+            echo "Required environment variables are missing."
+            exit 1
+          fi
+
+          if [[ "$APP_ENV" != "$TARGET_ENV" ]]; then
+            echo "Environment mismatch detected."
+            exit 1
+          fi
+
+          case "$APP_ENV:$LOG_LEVEL" in
+            development:DEBUG|staging:INFO|production:WARNING)
+              echo "Environment configuration verified."
+              ;;
+            *)
+              echo "Unexpected configuration for selected environment."
+              exit 1
+              ;;
+          esac
+
+      - name: Simulate application deployment
+        shell: bash
+        run: |
+          echo "Target environment: $TARGET_ENV"
+          echo "Log level: $LOG_LEVEL"
+          echo "Deployment simulation successful."
+          echo "No infrastructure was modified."
