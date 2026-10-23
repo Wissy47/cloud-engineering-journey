@@ -48,7 +48,10 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install -r requirements.txt
-
+      - name: Simulate Python quality gate failure
+        run: |
+          echo "Intentional Day 6 pipeline failure test"
+          exit 1
       - name: Run pytest
         run: |
           python -m pytest -v
