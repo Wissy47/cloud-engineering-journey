@@ -1,0 +1,401 @@
+
+name: Week 10 Day 7 - CI/CD Capstone
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "week10/day2/**"
+      - "week10/day3/**"
+      - "week10/day4/**"
+      - "week10/day7/**"
+      - ".github/workflows/week10-day7.yml"
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "week10/day2/**"
+      - "week10/day3/**"
+      - "week10/day4/**"
+      - "week10/day7/**"
+      - ".github/workflows/week10-day7.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    name: Python Quality Gate
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: week10/day2
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Execute automated tests
+        run: python -m pytest -v
+
+  docker-build:
+    name: Docker Build and Health Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./week10/day3
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: week10-day7-api:ci
+
+      - name: Inspect image
+        run: |
+          docker image inspect week10-day7-api:ci \
+            --format 'OS={{.Os}} Architecture={{.Architecture}}'
+
+      - name: Start health-test container
+        run: |
+          docker run -d \
+            --name week10-day7-health-test \
+            -p 127.0.0.1:8097:8080 \
+            week10-day7-api:ci
+
+      - name: Verify API health
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 15); do
+            if curl --fail --silent \
+              http://127.0.0.1:8097/health; then
+              echo
+              echo "Day 7 Docker health check passed"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Day 7 Docker health check failed"
+          docker logs week10-day7-health-test
+          exit 1
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker logs week10-day7-health-test 2>&1 || true
+
+      - name: Clean up health-test container
+        if: always()
+        run: |
+          if docker container inspect week10-day7-health-test \
+            > /dev/null 2>&1; then
+            docker rm -f week10-day7-health-test
+            echo "Day 7 health-test container removed"
+          fi
+
+      - name: Save verified Docker image and checksum
+        run: |
+          set -euo pipefail
+
+          mkdir -p capstone-artifact
+
+          docker save week10-day7-api:ci \
+            -o capstone-artifact/application-image.tar
+
+          (
+            cd capstone-artifact
+            sha256sum application-image.tar \
+              > application-image.tar.sha256
+            sha256sum -c application-image.tar.sha256
+          )
+
+          ls -lh capstone-artifact/
+
+      - name: Upload verified Docker artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: week10-day7-verified-image
+          path: |
+            capstone-artifact/application-image.tar
+            capstone-artifact/application-image.tar.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+  artifact-verification:
+    name: Verify Promoted Docker Artifact
+    needs: [python-tests, docker-build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download verified Docker artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: week10-day7-verified-image
+          path: capstone-artifact
+
+      - name: Verify artifact checksum
+        run: |
+          set -euo pipefail
+
+          cd capstone-artifact
+          sha256sum -c application-image.tar.sha256
+
+          echo "Promoted Docker artifact checksum verified"
+
+      - name: Load promoted Docker image
+        run: |
+          docker load \
+            -i capstone-artifact/application-image.tar
+
+          docker image inspect week10-day7-api:ci \
+            --format 'Loaded image: {{.Id}}'
+
+      - name: Start promoted image
+        run: |
+          docker run -d \
+            --name week10-day7-promoted-test \
+            -p 127.0.0.1:8098:8080 \
+            week10-day7-api:ci
+
+      - name: Verify promoted application health
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 15); do
+            if curl --fail --silent \
+              http://127.0.0.1:8098/health; then
+              echo
+              echo "Promoted Docker image health check passed"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Promoted image health verification failed"
+          docker logs week10-day7-promoted-test
+          exit 1
+
+      - name: Show promoted container logs on failure
+        if: failure()
+        run: |
+          docker logs week10-day7-promoted-test 2>&1 || true
+
+      - name: Clean up promoted test container
+        if: always()
+        run: |
+          if docker container inspect week10-day7-promoted-test \
+            > /dev/null 2>&1; then
+            docker rm -f week10-day7-promoted-test
+            echo "Promoted test container removed"
+          fi
+
+  terraform-validation:
+    name: Terraform Infrastructure Quality Gate
+    needs: [artifact-verification]
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./week10/day4
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.16.5"
+          terraform_wrapper: false
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive
+
+      - name: Initialize Terraform
+        run: terraform init -input=false -lockfile=readonly
+
+      - name: Validate Terraform configuration
+        run: terraform validate -no-color
+
+      - name: Start disposable floci
+        run: |
+          docker run -d \
+            --name week10-day7-floci \
+            -p 127.0.0.1:4566:4566 \
+            floci/floci:2.3.0
+
+      - name: Wait for floci health
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent \
+              http://127.0.0.1:4566/_localstack/health \
+              > /dev/null; then
+              echo "Day 7 floci health check passed"
+              exit 0
+            fi
+
+            sleep 2
+          done
+
+          echo "Day 7 floci did not become healthy"
+          exit 1
+
+      - name: Generate Terraform plan
+        run: |
+          set +e
+
+          terraform plan \
+            -input=false \
+            -no-color \
+            -refresh=false \
+            -detailed-exitcode
+
+          PLAN_EXIT_CODE=$?
+
+          set -e
+
+          case "$PLAN_EXIT_CODE" in
+            0)
+              echo "Terraform plan succeeded: no changes"
+              ;;
+            2)
+              echo "Terraform plan succeeded: changes proposed"
+              ;;
+            *)
+              echo "Terraform plan failed with exit code $PLAN_EXIT_CODE"
+              exit "$PLAN_EXIT_CODE"
+              ;;
+          esac
+
+      - name: Show floci logs on failure
+        if: failure()
+        run: docker logs --tail 100 week10-day7-floci 2>&1 || true
+
+      - name: Clean up disposable floci
+        if: always()
+        run: |
+          if docker container inspect week10-day7-floci \
+            > /dev/null 2>&1; then
+            docker rm -f week10-day7-floci
+            echo "Day 7 floci container removed"
+          fi
+
+  development-release:
+    name: Verify Development Release
+    needs: [artifact-verification, terraform-validation]
+    runs-on: ubuntu-latest
+
+    environment:
+      name: development
+
+    env:
+      APP_ENV: ${{ vars.APP_ENV }}
+      LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+
+    steps:
+      - name: Validate development configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$APP_ENV" != "development" ]]; then
+            echo "Incorrect development environment."
+            exit 1
+          fi
+
+          if [[ "$LOG_LEVEL" != "DEBUG" ]]; then
+            echo "Incorrect development log level."
+            exit 1
+          fi
+
+          echo "Development configuration verified."
+
+      - name: Download release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: week10-day7-verified-image
+          path: release-artifact
+
+      - name: Verify release artifact integrity
+        run: |
+          set -euo pipefail
+
+          cd release-artifact
+
+          sha256sum -c application-image.tar.sha256
+
+          echo "Release artifact integrity verified."
+
+      - name: Load release image
+        run: |
+          docker load -i release-artifact/application-image.tar
+
+          docker image inspect week10-day7-api:ci \
+            --format 'Release image: {{.Id}}'
+
+      - name: Start development release container
+        run: |
+          docker run -d \
+            --name week10-day7-release-test \
+            -p 127.0.0.1:8099:8080 \
+            week10-day7-api:ci
+
+      - name: Verify development release health
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 15); do
+            if curl --fail --silent \
+              http://127.0.0.1:8099/health; then
+              echo
+              echo "Development release health check passed"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Development release health check failed"
+          docker logs week10-day7-release-test
+          exit 1
+
+      - name: Confirm release verification
+        run: |
+          echo "All capstone quality gates passed."
+          echo "Verified Docker artifact reused successfully."
+          echo "Development release verification completed."
+          echo "No real infrastructure was deployed."
+
+      - name: Show release logs on failure
+        if: failure()
+        run: |
+          docker logs week10-day7-release-test 2>&1 || true
+
+      - name: Clean up release container
+        if: always()
+        run: |
+          if docker container inspect week10-day7-release-test \
+            > /dev/null 2>&1; then
+            docker rm -f week10-day7-release-test
+            echo "Development release test container removed"
+          fi
