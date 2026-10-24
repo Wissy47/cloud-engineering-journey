@@ -153,7 +153,10 @@ jobs:
         with:
           name: week10-day7-verified-image
           path: capstone-artifact
-
+      - name: Simulate artifact corruption
+        run: |
+          printf 'intentional-corruption' >> capstone-artifact/application-image.tar
+          echo "Artifact corruption injected for Day 7 failure test."
       - name: Verify artifact checksum
         run: |
           set -euo pipefail
