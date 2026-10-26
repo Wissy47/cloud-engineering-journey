@@ -1,0 +1,15 @@
+# Python virtual environment
+.venv/
+
+# Generated encryption lab files
+plaintext.txt
+decrypted.txt
+ciphertext.bin
+
+# Python-generated files
+__pycache__/
+*.pyc
+
+# Local environment configuration
+.env
+.env.*
